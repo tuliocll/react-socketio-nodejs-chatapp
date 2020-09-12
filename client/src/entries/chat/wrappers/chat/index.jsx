@@ -1,6 +1,4 @@
-import React, {
-	Component
-} from 'react';
+import React, { Component } from 'react';
 
 import {
 	ContentEditableComponent,
@@ -9,41 +7,28 @@ import {
 	ButtonComponent
 } from 'shared/components';
 
-import {
-	UserInfoComponent
-} from 'entries/chat/components';
+import { UserInfoComponent } from 'entries/chat/components';
 
-import {
-	MessageListContainer
-} from 'entries/chat/containers';
+import { MessageListContainer } from 'entries/chat/containers';
 
-import {
-	connect
-} from 'react-redux';
+import { connect } from 'react-redux';
 
-import {
-	confirmAlert
-} from 'react-confirm-alert';
+import { confirmAlert } from 'react-confirm-alert';
 
-import {
-	bindActionCreators
-} from 'redux';
+import { bindActionCreators } from 'redux';
 
 import constants from 'modules/constants';
 import * as conversationActions from 'redux/actions/conversation';
 import * as messageActions from 'redux/actions/message';
 
 class ChatWrapper extends Component {
-	constructor (props) {
+	constructor(props) {
 		super(props);
 		this.conversationContainer = React.createRef();
 	}
 
-	componentDidUpdate () {
-		const {
-			current
-		} = this.conversationContainer;
-
+	componentDidUpdate() {
+		const { current } = this.conversationContainer;
 
 		if (current) {
 			current.scrollTop = current.scrollHeight;
@@ -51,44 +36,35 @@ class ChatWrapper extends Component {
 	}
 
 	setConversationIsRead = () => {
-		const {
-			conversationData,
-			conversationActions
-		} = this.props;
+		const { conversationData, conversationActions } = this.props;
 
-		const {
-			resetConversationUnreadMessages
-		} = conversationActions;
+		const { resetConversationUnreadMessages } = conversationActions;
 
 		const {
 			currentPartnerIdConversation,
 			result: conversations
 		} = conversationData;
 
-		const currentConversation = conversations.find(item => String(item.partnerId._id) === String(currentPartnerIdConversation));
+		const currentConversation = conversations.find(
+			item =>
+				String(item.partnerId._id) ===
+				String(currentPartnerIdConversation)
+		);
 
-		const {
-			partnerId,
-			unreadMessages
-		} = currentConversation;
+		const { partnerId, unreadMessages } = currentConversation;
 
 		if (unreadMessages > 0) {
 			resetConversationUnreadMessages({
 				partner: partnerId
 			});
 		}
-	}
+	};
 
-	handleSendMessage = (message) => {
+	handleSendMessage = message => {
 		if (message) {
-			const {
-				conversationData,
-				messageActions
-			} = this.props;
+			const { conversationData, messageActions } = this.props;
 
-			const {
-				currentPartnerIdConversation
-			} = conversationData;
+			const { currentPartnerIdConversation } = conversationData;
 
 			const params = {
 				body: {
@@ -99,23 +75,31 @@ class ChatWrapper extends Component {
 
 			messageActions.postMessage(params);
 		}
-	}
+	};
 
-	handleDeleteMessage = (messageId) => {
-		const {
-			messageActions,
-			conversationData
-		} = this.props;
+	handleStartVideoCall = () => {
+		const { conversationData, messageActions } = this.props;
 
-		const {
-			currentPartnerIdConversation: partnerId
-		} = conversationData;
+		const { currentPartnerIdConversation } = conversationData;
 
+		const params = {
+			body: {
+				receiverId: currentPartnerIdConversation
+			}
+		};
+
+		messageActions.startVideoCall(params);
+	};
+
+	handleDeleteMessage = messageId => {
+		const { messageActions, conversationData } = this.props;
+
+		const { currentPartnerIdConversation: partnerId } = conversationData;
 
 		confirmAlert({
 			customUI: ({ onClose }) => {
 				return (
-					<div className='confirm-popup'>
+					<div className="confirm-popup">
 						<LabelComponent
 							fontSemiBold
 							text={constants.LABELS.CHAT.DELETE_MESSAGE_CONFIRM}
@@ -123,7 +107,7 @@ class ChatWrapper extends Component {
 							alignCenter
 							margin="0px 0px 25px 0px"
 						/>
-						<div className='buttons-container'>
+						<div className="buttons-container">
 							<ButtonComponent
 								type="button"
 								defaultButton
@@ -155,36 +139,27 @@ class ChatWrapper extends Component {
 				);
 			}
 		});
-	}
+	};
 
-	getCurrentConversationMessages = (messages) => {
-		const {
-			messageData
-		} = this.props;
+	getCurrentConversationMessages = messages => {
+		const { messageData } = this.props;
 
-		const {
-			deleteMessage
-		} = messageData;
+		const { deleteMessage } = messageData;
 
 		return messages.map(message => {
 			const newItem = message;
-			newItem.isFetchingAction = (
-				deleteMessage.isFetching
-				&& String(deleteMessage.currentMessageIdIsDeleting) === String(message._id)
-			);
+			newItem.isFetchingAction =
+				deleteMessage.isFetching &&
+				String(deleteMessage.currentMessageIdIsDeleting) ===
+					String(message._id);
 			return message;
 		});
-	}
+	};
 
 	renderChatContainer = () => {
-		const {
-			conversationData,
-			messageData
-		} = this.props;
+		const { conversationData, messageData } = this.props;
 
-		const {
-			getMessages
-		} = messageData;
+		const { getMessages } = messageData;
 
 		const {
 			currentPartnerIdConversation,
@@ -193,31 +168,28 @@ class ChatWrapper extends Component {
 
 		if (!currentPartnerIdConversation) {
 			return (
-				<div
-					className='empty-message-container'
-				>
+				<div className="empty-message-container">
 					<IconComponent
 						icon="chat-emoji"
 						width={200}
 						height={200}
-						margin='0px 0px 25px 20px'
+						margin="0px 0px 25px 20px"
 					/>
 				</div>
 			);
 		}
 
-		const currentConversation = conversations.find(item => String(item.partnerId._id) === String(currentPartnerIdConversation));
+		const currentConversation = conversations.find(
+			item =>
+				String(item.partnerId._id) ===
+				String(currentPartnerIdConversation)
+		);
 
-		const {
-			nickname,
-			profileColor
-		} = currentConversation.partnerId;
+		const { nickname, profileColor } = currentConversation.partnerId;
 
 		return (
-			<div
-				className='chat-content'
-			>
-				<header className='header-container'>
+			<div className="chat-content">
+				<header className="header-container">
 					<UserInfoComponent
 						isFetching={false}
 						sketchDark
@@ -241,20 +213,29 @@ class ChatWrapper extends Component {
 							margin: '0px 0px 0px 14px'
 						}}
 					/>
+					<button
+						onClick={() => {
+							this.props.startCall();
+						}}
+					>
+						Video
+					</button>
 				</header>
 				<section
 					ref={this.conversationContainer}
-					className='conversation-container'
+					className="conversation-container"
 				>
 					<MessageListContainer
 						isFetching={getMessages.isFetching}
-						items={this.getCurrentConversationMessages(currentConversation.messages)}
+						items={this.getCurrentConversationMessages(
+							currentConversation.messages
+						)}
 						onMouseOver={this.setConversationIsRead}
 						onFocus={this.setConversationIsRead}
 						handleDeleteMessage={this.handleDeleteMessage}
 					/>
 				</section>
-				<footer className='footer-container'>
+				<footer className="footer-container">
 					<ContentEditableComponent
 						onEnter={this.handleSendMessage}
 						onFocus={this.setConversationIsRead}
@@ -262,27 +243,23 @@ class ChatWrapper extends Component {
 				</footer>
 			</div>
 		);
-	}
+	};
 
-	render () {
+	render() {
 		return (
-			<div className='chat-container'>
-				{
-					this.renderChatContainer()
-				}
-			</div>
+			<div className="chat-container">{this.renderChatContainer()}</div>
 		);
 	}
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	return {
 		conversationData: state.conversation,
 		messageData: state.message
 	};
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
 	return {
 		conversationActions: bindActionCreators(conversationActions, dispatch),
 		messageActions: bindActionCreators(messageActions, dispatch)

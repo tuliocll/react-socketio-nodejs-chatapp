@@ -1,31 +1,21 @@
-import {
-	takeLatest,
-	takeEvery,
-	put
-} from 'redux-saga/effects';
+import { takeLatest, takeEvery, put } from "redux-saga/effects";
 
-import {
-	sendRequest
-} from 'modules/utils';
+import { sendRequest } from "modules/utils";
 
 import {
 	POST_MESSAGE,
 	GET_MESSAGES,
 	DELETE_MESSAGE
-} from 'redux/constants/message';
+} from "redux/constants/message";
 
-import {
-	toast
-} from 'react-toastify';
+import { toast } from "react-toastify";
 
-import constants from 'modules/constants';
-import * as messageActions from 'redux/actions/message';
-import * as conversationActions from 'redux/actions/conversation';
+import constants from "modules/constants";
+import * as messageActions from "redux/actions/message";
+import * as conversationActions from "redux/actions/conversation";
 
-function* sendMessagePostFetchSaga (action) {
-	const {
-		body
-	} = action.params;
+function* sendMessagePostFetchSaga(action) {
+	const { body } = action.params;
 
 	try {
 		const response = yield sendRequest({
@@ -36,25 +26,25 @@ function* sendMessagePostFetchSaga (action) {
 
 		yield put(messageActions.postMessageReceived());
 
-		yield put(conversationActions.addMessageToCurrentConversationMessages({
-			message: {
-				currentUserIsSender: true,
-				...response.result
-			},
-			partner: {
-				_id: response.result.receiverId
-			}
-		}));
+		yield put(
+			conversationActions.addMessageToCurrentConversationMessages({
+				message: {
+					currentUserIsSender: true,
+					...response.result
+				},
+				partner: {
+					_id: response.result.receiverId
+				}
+			})
+		);
 	} catch (e) {
 		yield put(messageActions.postMessageReceived());
 		toast.error(constants.LABELS.MAIN.GLOBAL_ERROR);
 	}
 }
 
-function* getMessagesFetchSaga (action) {
-	const {
-		partnerId
-	} = action.params;
+function* getMessagesFetchSaga(action) {
+	const { partnerId } = action.params;
 
 	const query = {
 		partnerId
@@ -68,21 +58,20 @@ function* getMessagesFetchSaga (action) {
 		});
 
 		yield put(messageActions.getMessagesReceived());
-		yield put(conversationActions.setCurrentConversationMessages({
-			result: response.result,
-			partnerId
-		}));
+		yield put(
+			conversationActions.setCurrentConversationMessages({
+				result: response.result,
+				partnerId
+			})
+		);
 	} catch (e) {
 		yield put(messageActions.getMessagesReceived());
 		toast.error(constants.LABELS.MAIN.GLOBAL_ERROR);
 	}
 }
 
-function* deleteMessageFetchSaga (action) {
-	const {
-		messageId,
-		partnerId
-	} = action.params;
+function* deleteMessageFetchSaga(action) {
+	const { messageId, partnerId } = action.params;
 
 	const body = {
 		messageId,
@@ -97,10 +86,12 @@ function* deleteMessageFetchSaga (action) {
 		});
 
 		yield put(messageActions.deleteMessageReceived());
-		yield put(conversationActions.removeMessageFromConversation({
-			messageId,
-			partnerId
-		}));
+		yield put(
+			conversationActions.removeMessageFromConversation({
+				messageId,
+				partnerId
+			})
+		);
 	} catch (e) {
 		yield put(messageActions.deleteMessageReceived());
 		toast.error(constants.LABELS.MAIN.GLOBAL_ERROR);

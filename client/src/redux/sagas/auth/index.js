@@ -1,35 +1,23 @@
-import {
-	put,
-	takeLatest
-} from 'redux-saga/effects';
+import { put, takeLatest } from "redux-saga/effects";
 
-import {
-	toast
-} from 'react-toastify';
+import { toast } from "react-toastify";
 
-import {
-	sendRequest,
-	login
-} from 'modules/utils';
+import { sendRequest, login } from "modules/utils";
 
 import {
 	POST_SIGNUP,
 	POST_SIGNIN,
 	GET_VERIFY_NICKNAME
-} from 'redux/constants/auth';
+} from "redux/constants/auth";
 
-import * as authActions from 'redux/actions/auth';
-import * as formActions from 'redux/actions/form';
-import constants from 'modules/constants';
+import * as authActions from "redux/actions/auth";
+import * as formActions from "redux/actions/form";
+import constants from "modules/constants";
 
-function* signInPostFetch (props) {
-	const {
-		params
-	} = props;
+function* signInPostFetch(props) {
+	const { params } = props;
 
-	const {
-		body
-	} = params;
+	const { body } = params;
 
 	try {
 		const response = yield sendRequest({
@@ -38,9 +26,11 @@ function* signInPostFetch (props) {
 			body
 		});
 
-		yield put(authActions.postSignInReceived({
-			errors: response.errors
-		}));
+		yield put(
+			authActions.postSignInReceived({
+				errors: response.errors
+			})
+		);
 
 		if (response.success && response.token && response.user) {
 			login(response.token, response.user);
@@ -51,15 +41,10 @@ function* signInPostFetch (props) {
 	}
 }
 
-function* signUpPostFetch (props) {
-	const {
-		params,
-		formName
-	} = props;
+function* signUpPostFetch(props) {
+	const { params, formName } = props;
 
-	const {
-		body
-	} = params;
+	const { body } = params;
 
 	try {
 		const response = yield sendRequest({
@@ -68,9 +53,11 @@ function* signUpPostFetch (props) {
 			body
 		});
 
-		yield put(formActions.setFormError(formName, {
-			errors: response.errors
-		}));
+		yield put(
+			formActions.setFormError(formName, {
+				errors: response.errors
+			})
+		);
 
 		yield put(authActions.postSignUpReceived());
 
@@ -84,31 +71,33 @@ function* signUpPostFetch (props) {
 	}
 }
 
-function* verifyNicknameGetFetch (props) {
-	const {
-		params
-	} = props;
+function* verifyNicknameGetFetch(props) {
+	const { params } = props;
 
-	const {
-		body,
-		formName
-	} = params;
+	const { body, formName } = params;
 
 	try {
 		const response = yield sendRequest({
-			url: `${constants.API.ROOT}${constants.API.ACTIONS.VERIFY_NICKNAME}`,
+			url: `${constants.API.ROOT}${
+				constants.API.ACTIONS.VERIFY_NICKNAME
+			}`,
 			method: constants.API.METHODS.GET,
 			query: body
 		});
 
-		yield put(formActions.setFormError(formName, {
-			errors: response.errors
-		}));
+		yield put(
+			formActions.setFormError(formName, {
+				errors: response.errors
+			})
+		);
 
-		yield put(authActions.getVerifyNicknameReceived({
-			errors: response.errors
-		}));
+		yield put(
+			authActions.getVerifyNicknameReceived({
+				errors: response.errors
+			})
+		);
 	} catch (e) {
+		console.log(e);
 		yield put(authActions.getVerifyNicknameReceived());
 		toast.error(constants.LABELS.MAIN.GLOBAL_ERROR);
 	}
